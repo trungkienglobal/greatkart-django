@@ -1,3 +1,4 @@
+from itertools import product
 from django.db import models
 from category.models import Category
 from django.urls import reverse
@@ -21,3 +22,27 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_name
+
+class VariationManager(models.Manager):
+    def color(self):
+        return self.filter(variation_category='color')
+    def size(self):
+        return self.filter(variation_category='size')
+
+variation_category_choice = [
+    ('color', 'color'),
+    ('size', 'size')
+]
+
+class Variation(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    variation_category = models.CharField(max_length=100, choices=variation_category_choice)
+    variation_value = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    created_date = models.DateField(auto_now=True)
+
+    object = VariationManager()
+
+    def __str__(self):
+        return self.variation_value
+    
